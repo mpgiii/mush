@@ -1,0 +1,11 @@
+goodbyte
+hi
+Makefile
+misc.c
+misc.h
+misc.o
+out
+parse.c
+parseline
+parse.o
+test.txt
