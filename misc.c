@@ -74,7 +74,9 @@ int parselines(char* lines[], int count, struct command pipeline[]) {
                fprintf(stderr, "%s: ambiguous output\n", argv[0]);
                return(-1);
             }
-            pipeline[i].output = open(line, O_WRONLY | O_CREAT | O_TRUNC, S_IRWXU | S_IRWXG | S_IRWXO);
+            pipeline[i].output = open(line, O_WRONLY | O_CREAT | O_TRUNC, 
+                                            S_IRUSR | S_IWUSR | S_IRGRP | 
+                                            S_IWGRP | S_IROTH | S_IWOTH);
             if (pipeline[i].output == -1) {
                perror(line);
                return(-1);
@@ -188,9 +190,25 @@ int printerheader(int stage, struct command com) {
 int run_commands(int count, struct command pipeline[]) {
    int i, j;
    int status;
+   int newcount;
+
+   newcount = count;
 
    for (i = 0; i < count; i++) {
-      if (fork() == 0) {
+
+
+      /* also checks for "cd" and "exit" to handle with my built-ins */
+      if (0 == strcmp(pipeline[i].argv[0], "cd")) {
+         newcount--;
+         my_cd();
+         return -1;
+      }
+      else if (0 == strcmp(pipeline[i].argv[0], "exit")) {
+         exit(-1);
+      }
+
+      /* if it's neither of these, fork out */
+      else if (fork() == 0) {
          /* child */
 
          /* make the stdin and stdout match what inputs and
@@ -231,7 +249,7 @@ int run_commands(int count, struct command pipeline[]) {
          close(pipeline[j].output);
    }
 
-   for (j = 0; j < count; j++) {
+   for (j = 0; j < newcount; j++) {
       /* wait for all our beautiful children */
       if (-1 == wait(&status)) {
          perror("wait");

@@ -10,66 +10,6 @@
 
 #include "misc.h"
 
-int main(int argc, char* argv[]) {
-   
-   int i, c, length;
-   char input[LINE_LENGTH + 1];
-   FILE* infile;
-   
-   if (argc != 1) {
-      if (argc > 2) {
-         fprintf(stderr, "%s: too many arguments.\n", argv[0]);
-         return -1;
-      }
-      if (NULL == (infile = fopen(argv[1], "r"))) {
-         perror("fopen");
-         return -1;
-      }
-   }
-   else {
-      infile = stdin;
-   }
-
-   
-   while (1) {
-      length = 0;
-      if (infile == stdin) {
-         printf("8-P ");
-         fflush(stdout);
-      }
-
-      /* grab the input from stdin */
-      while ((c = fgetc(infile)) != '\n' && c != EOF) {
-         if (length > LINE_LENGTH) {
-            fprintf(stderr, "command too long\n");
-            exit(EXIT_FAILURE);
-         }
-         else {
-            input[length++] = c;
-         }
-      }
-      input[length] = '\0';
-
-      /* if the user inputted nothing, go away */
-      if (length == 0) {
-         fprintf(stderr, "nothing to read.\n");
-         continue;
-      }
-      
-      helper(input, length);
-      
-      for (i = 0; i < LINE_LENGTH; i++) {
-         input[i] = '\0';
-      }
-      
-      if (infile != stdin) {
-         break;
-      }
-      
-   }
-   
-   return 0;
-}
 
 int helper(char input[], int length) {
    char* lines[PIPE_COMMANDS];
@@ -127,6 +67,67 @@ int helper(char input[], int length) {
    
    if (-1 == run_commands(j, pipeline)) {
       return -1;
+   }
+   
+   return 0;
+}
+
+
+int main(int argc, char* argv[]) {
+   
+   int i, c, length;
+   char input[LINE_LENGTH + 1];
+   FILE* infile;
+   
+   if (argc != 1) {
+      if (argc > 2) {
+         fprintf(stderr, "%s: too many arguments.\n", argv[0]);
+         return -1;
+      }
+      if (NULL == (infile = fopen(argv[1], "r"))) {
+         perror("fopen");
+         return -1;
+      }
+   }
+   else {
+      infile = stdin;
+   }
+
+   
+   while (1) {
+      length = 0;
+      if (infile == stdin) {
+         printf("8-P ");
+         fflush(stdout);
+      }
+
+      /* grab the input from stdin */
+      while ((c = fgetc(infile)) != '\n' && c != EOF) {
+         if (length > LINE_LENGTH) {
+            fprintf(stderr, "command too long\n");
+            exit(EXIT_FAILURE);
+         }
+         else {
+            input[length++] = c;
+         }
+      }
+      input[length] = '\0';
+
+      /* if the user inputted nothing, go away */
+      if (length == 0) {
+         continue;
+      }
+      
+      helper(input, length);
+      
+      for (i = 0; i < LINE_LENGTH; i++) {
+         input[i] = '\0';
+      }
+      
+      if (infile != stdin) {
+         break;
+      }
+      
    }
    
    return 0;

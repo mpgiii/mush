@@ -8,6 +8,8 @@
 #include <sys/wait.h>
 #include <fcntl.h>
 
+#include "builtins.h"
+
 #define LINE_LENGTH 512
 #define PIPE_COMMANDS 10
 #define COMMAND_ARGS 10
