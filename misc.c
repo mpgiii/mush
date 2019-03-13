@@ -98,7 +98,7 @@ int parselines(char* lines[], int count, struct command pipeline[]) {
          /* if we have too many arguments we can just make that an error
           * (thanks, Professor Nico!) */
          if (argc > COMMAND_ARGS) {
-            fprintf(stderr, "%s: too many arguments\n", argv[0]);
+            fprintf(stderr, "Too many arguments.\n");
             return(-1);
          }
          
@@ -206,9 +206,9 @@ int run_commands(int count, struct command pipeline[]) {
 
          /* close all open file descriptors */
          for (j = 0; j < count; j++) {
-            if (!(pipeline[j].input == STDIN_FILENO))
+            if (pipeline[j].input != STDIN_FILENO)
                close(pipeline[j].input);
-            if (!(pipeline[j].output == STDOUT_FILENO))
+            if (pipeline[j].output != STDOUT_FILENO)
                close(pipeline[j].output);
          }
 
@@ -220,6 +220,17 @@ int run_commands(int count, struct command pipeline[]) {
       }
 
    }
+
+   /* parent */
+
+   /* close all open file descriptors */
+   for (j = 0; j < count; j++) {
+      if (pipeline[j].input != STDIN_FILENO)
+         close(pipeline[j].input);
+      if (pipeline[j].output != STDOUT_FILENO)
+         close(pipeline[j].output);
+   }
+
    for (j = 0; j < count; j++) {
       /* wait for all our beautiful children */
       if (-1 == wait(&status)) {

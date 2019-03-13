@@ -115,8 +115,8 @@ int helper(char input[], int length) {
    }
    
    if (j > PIPE_COMMANDS) {
-      fprintf(stderr, "pipeline too deep\n");
-      exit(-1);
+      fprintf(stderr, "Pipeline too deep.\n");
+      return(-1);
    }
    
    /* once we've gotten here, lines is populated and ready to be parsed */
