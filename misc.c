@@ -231,7 +231,7 @@ int run_commands(int count, struct command pipeline[]) {
          }
 
          /* and finally execute the command given */
-         if (-1 == execv(pipeline[i].argv[0], pipeline[i].argv)) {
+         if (-1 == execvp(pipeline[i].argv[0], pipeline[i].argv)) {
             perror(pipeline[i].argv[0]);
             return -1;
          }
