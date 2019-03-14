@@ -1,8 +1,19 @@
-/* parseline
- * A program that parses the input of a command line
- * and stores them as a list of command structures
- * which contain each command's argc, argv, input, and
- * output.
+/* mush
+ * A minimally useful shell. Can run all commands
+ * available to it in its given path.
+ * The shell also supports pipelines, and features
+ * both an interactive and a batch processing mode.
+ *
+ * This shell is limited to a maximum pipeline size
+ * of 10, a maximum amount of arguments to a given
+ * function of 10, and a maximum line length of 512.
+ * These values can be adjusted in the misc header.
+ *
+ * Mush also has support for redirection of the
+ * input and output of a file, using ">" and "<"
+ * like one would in BASH.
+ *
+ * NOT YET IMPLEMENTED: handling of SIGINT.
  *
  * Written by Michael Georgariou for 
  * CPE 357 with Professor Nico at
@@ -41,9 +52,8 @@ int helper(char input[], int length) {
       else {
          /* if the pipe is not surrounded by whitespace, exit */
          if (!isspace(*(end-1)) || !isspace(*(end+1))) {
-            printf("%c\n", *(end-1));
-            fprintf(stderr, "invalid null command\n");
-            exit(EXIT_FAILURE);
+            fprintf(stderr, "invalid null command.\n");
+            return -1;
          }
          /* store the line in our list of lines */
          lines[j] = (char *) calloc(end - start + 1, sizeof(char));
@@ -79,7 +89,9 @@ int main(int argc, char* argv[]) {
    char input[LINE_LENGTH + 1];
    FILE* infile;
    
+   /* parse input file, if given */
    if (argc != 1) {
+      /* only expect two arguments, max */
       if (argc > 2) {
          fprintf(stderr, "%s: too many arguments.\n", argv[0]);
          return -1;
@@ -89,23 +101,29 @@ int main(int argc, char* argv[]) {
          return -1;
       }
    }
+   /* if there was no input, set stdin as our input */
    else {
       infile = stdin;
    }
 
    
+   /* loop in here until the exit command is typed */
    while (1) {
       length = 0;
-            
+      
+      /* if we were are the end of the file: */
       if (c == EOF) {
+         /* and stdin is our input, reset. */
          if (infile == stdin) {
             printf("\n");
          }
+         /* and something else is our input, stop doing stuff */
          else {
             break;
          }
       }
       
+      /* print the prompt (but only if using stdin) */
       if (infile == stdin) {
          printf("8-P ");
          fflush(stdout);
@@ -122,6 +140,7 @@ int main(int argc, char* argv[]) {
             input[length++] = c;
          }
       }
+      /* null terminate (so we can treat it like a string */
       input[length] = '\0';
 
       /* if the user inputted nothing, go away */
@@ -129,20 +148,13 @@ int main(int argc, char* argv[]) {
          continue;
       }
       
+      /* handle the input. see above function */
       helper(input, length);
       
       /* clear the buffer for the next command */
       for (i = 0; i < LINE_LENGTH; i++) {
          input[i] = '\0';
-      }
-      
-      /* if we're not using interactive mode,
-       * break out after it's done. */
-      if (c == EOF) {
-         printf("\n");
-         break;
-      }
-      
+      }      
    }
    
    return 0;
