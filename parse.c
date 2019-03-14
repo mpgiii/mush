@@ -96,13 +96,24 @@ int main(int argc, char* argv[]) {
    
    while (1) {
       length = 0;
+            
+      if (c == EOF) {
+         if (infile == stdin) {
+            printf("\n");
+         }
+         else {
+            break;
+         }
+      }
+      
       if (infile == stdin) {
          printf("8-P ");
          fflush(stdout);
       }
+      
 
       /* grab the input from stdin */
-      while ((c = fgetc(infile)) != '\n' && c != EOF) {
+      while (((c = fgetc(infile)) != '\n') && (c != EOF)) {
          if (length > LINE_LENGTH) {
             fprintf(stderr, "command too long\n");
             exit(EXIT_FAILURE);
@@ -120,11 +131,15 @@ int main(int argc, char* argv[]) {
       
       helper(input, length);
       
+      /* clear the buffer for the next command */
       for (i = 0; i < LINE_LENGTH; i++) {
          input[i] = '\0';
       }
       
-      if (infile != stdin) {
+      /* if we're not using interactive mode,
+       * break out after it's done. */
+      if (c == EOF) {
+         printf("\n");
          break;
       }
       
