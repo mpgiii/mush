@@ -200,7 +200,7 @@ int run_commands(int count, struct command pipeline[]) {
       /* also checks for "cd" and "exit" to handle with my built-ins */
       if (0 == strcmp(pipeline[i].argv[0], "cd")) {
          newcount--;
-         my_cd();
+         my_cd(pipeline[i].argc, pipeline[i].argv);
          return -1;
       }
       else if (0 == strcmp(pipeline[i].argv[0], "exit")) {
