@@ -13,7 +13,12 @@
  * input and output of a file, using ">" and "<"
  * like one would in BASH.
  *
- * NOT YET IMPLEMENTED: handling of SIGINT.
+ * The shell also handles an interrupt signal.
+ * If the signal is generated during the running of a
+ * child process, it will terminate the child but
+ * continue running the shell. However, if no children
+ * are being run and the shell receives an interrupt
+ * signal, it will close the shell.
  *
  * Written by Michael Georgariou for 
  * CPE 357 with Professor Nico at
@@ -85,7 +90,7 @@ int helper(char input[], int length) {
 
 int main(int argc, char* argv[]) {
    
-   int i, c, length;
+   int i, c = 0, length;
    char input[LINE_LENGTH + 1];
    FILE* infile;
    

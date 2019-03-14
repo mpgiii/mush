@@ -1,5 +1,7 @@
 #include "builtins.h"
 
+/* changes the working directory */
+/* requires two arguments. */
 int my_cd(int argc, char* argv[]) {
    if (argc < 2) {
       fprintf(stderr, "cd: missing argument.\n");
@@ -19,6 +21,7 @@ int my_cd(int argc, char* argv[]) {
    return 0;
 }
 
+/* exits the program */
 int my_exit() {
    exit(-1);
 }

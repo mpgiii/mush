@@ -1,16 +1,20 @@
+/* Miscellaneous functions involving line parsing,
+ * command running, and child processes. This is
+ * used in conjunction with mush.c. */
+
 #include "misc.h"
 
 #define LEN_OF_IN_PIPE 18
 #define LEN_OF_OUT_PIPE 16
 
-int reset_buffer(char buffer[], int size) {
-   int i;
-   for (i = 0; i < size; i++) {
-      buffer[i] = '\0';
-   }
-   return 1;
-}
 
+/* Modifed from my Assignment 5: parseline. Goes
+ * through each line in a list of lines and creates
+ * structures for easier handling when actually
+ * running commands. Stores the commands in the passed
+ * in "pipeline" variable.
+ * Also creates the pipes which will be used in the case
+ * of a pipeline being passed. */
 int parselines(char* lines[], int count, struct command pipeline[]) {
    int i, j, argc = 0;
    char* argv[COMMAND_ARGS];
@@ -165,6 +169,14 @@ int parselines(char* lines[], int count, struct command pipeline[]) {
    return 0;
 }
 
+/* note: the function below was used in the parseline
+ * project. It does not work in this implementation of 
+ * line parsing, as the struct used for a command has
+ * been slightly modified. However, I have left it here,
+ * commented out, in case I need it for troubleshooting
+ * in the future.
+ */
+
 /*
 int printerheader(int stage, struct command com) {
    int i;
@@ -187,10 +199,19 @@ int printerheader(int stage, struct command com) {
 */
 
 
+
+/* Goes through each of the commands in the pipeline,
+ * creates child processes for them, and runs them
+ * all. Also sets the SIGINT signal to be ignored
+ * in order to kill child processes without blowing up
+ * our shell as well. */
 int run_commands(int count, struct command pipeline[]) {
    int i, j;
    int status;
    int newcount;
+   
+   /* ignore sigint while we run our children */
+   signal(SIGINT, SIG_IGN);
 
    newcount = count;
 
@@ -201,9 +222,12 @@ int run_commands(int count, struct command pipeline[]) {
       if (0 == strcmp(pipeline[i].argv[0], "cd")) {
          newcount--;
          my_cd(pipeline[i].argc, pipeline[i].argv);
-         return -1;
+         signal(SIGINT, SIG_DFL);
+         return 1;
       }
-      else if (0 == strcmp(pipeline[i].argv[0], "exit")) {
+      else if ((0 == strcmp(pipeline[i].argv[0], "exit")) ||
+               (0 == strcmp(pipeline[i].argv[0], "quit")) ||
+               (0 == strcmp(pipeline[i].argv[0], "logout"))) {
          exit(-1);
       }
 
@@ -215,10 +239,12 @@ int run_commands(int count, struct command pipeline[]) {
           * outputs were previously specified by user */
          if (-1 == dup2(pipeline[i].input, STDIN_FILENO)) {
             perror("dup2");
+            signal(SIGINT, SIG_DFL);
             return -1;
          }
          if (-1 == dup2(pipeline[i].output, STDOUT_FILENO)) {
             perror("dup2");
+            signal(SIGINT, SIG_DFL);
             return -1;
          }
 
@@ -230,9 +256,13 @@ int run_commands(int count, struct command pipeline[]) {
                close(pipeline[j].output);
          }
 
+         /* reenable our signal for the child to handle */
+         signal(SIGINT, SIG_DFL);
+         
          /* and finally execute the command given */
          if (-1 == execvp(pipeline[i].argv[0], pipeline[i].argv)) {
             perror(pipeline[i].argv[0]);
+            signal(SIGINT, SIG_DFL);
             return -1;
          }
       }
@@ -256,5 +286,9 @@ int run_commands(int count, struct command pipeline[]) {
          exit(-1);
       }
    }
+   
+   /* re-enable the signal after the children have run */
+   signal(SIGINT, SIG_DFL);
+   
    return 0;
 }
