@@ -265,6 +265,8 @@ int run_commands(int count, struct command pipeline[]) {
             signal(SIGINT, SIG_DFL);
             return -1;
          }
+         
+         return 0;
       }
 
    }
@@ -283,8 +285,10 @@ int run_commands(int count, struct command pipeline[]) {
       /* wait for all our beautiful children */
       if (-1 == wait(&status)) {
          perror("wait");
+         signal(SIGINT, SIG_DFL);
          exit(-1);
       }
+
    }
    
    /* re-enable the signal after the children have run */

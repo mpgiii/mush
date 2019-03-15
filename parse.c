@@ -81,8 +81,14 @@ int helper(char input[], int length) {
    }
    
    if (-1 == run_commands(j, pipeline)) {
+      signal(SIGINT, SIG_DFL);
       return -1;
    }
+
+   /* guarantees that signals are being handled again,
+    * in case an edge case occurs where the signal is
+    * still being blocked */
+   signal(SIGINT, SIG_DFL);
    
    return 0;
 }
@@ -130,7 +136,9 @@ int main(int argc, char* argv[]) {
       
       /* print the prompt (but only if using stdin) */
       if (infile == stdin) {
+         printf("\033[0;32m");
          printf("8-P ");
+         printf("\033[0m");
          fflush(stdout);
       }
       
