@@ -240,12 +240,12 @@ int run_commands(int count, struct command pipeline[]) {
          if (-1 == dup2(pipeline[i].input, STDIN_FILENO)) {
             perror("dup2");
             signal(SIGINT, SIG_DFL);
-            return -1;
+            exit(-1);
          }
          if (-1 == dup2(pipeline[i].output, STDOUT_FILENO)) {
             perror("dup2");
             signal(SIGINT, SIG_DFL);
-            return -1;
+            exit(-1);
          }
 
          /* close all open file descriptors */
@@ -263,7 +263,7 @@ int run_commands(int count, struct command pipeline[]) {
          if (-1 == execvp(pipeline[i].argv[0], pipeline[i].argv)) {
             perror(pipeline[i].argv[0]);
             signal(SIGINT, SIG_DFL);
-            return -1;
+            exit(-1);
          }
          
          return 0;
