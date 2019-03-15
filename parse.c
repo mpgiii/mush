@@ -93,10 +93,18 @@ int helper(char input[], int length) {
    return 0;
 }
 
+int clearbuffer(char input[]) {
+   int i;
+   for (i = 0; i < LINE_LENGTH; i++) {
+      input[i] = '\0';
+   }
+   return 0;
+}
+
 
 int main(int argc, char* argv[]) {
    
-   int i, c = 0, length;
+   int c = 0, length;
    char input[LINE_LENGTH + 1];
    FILE* infile;
    
@@ -147,7 +155,7 @@ int main(int argc, char* argv[]) {
       while (((c = fgetc(infile)) != '\n') && (c != EOF)) {
          if (length > LINE_LENGTH) {
             fprintf(stderr, "command too long\n");
-            exit(EXIT_FAILURE);
+            clearbuffer(input);
          }
          else {
             input[length++] = c;
@@ -165,9 +173,7 @@ int main(int argc, char* argv[]) {
       helper(input, length);
       
       /* clear the buffer for the next command */
-      for (i = 0; i < LINE_LENGTH; i++) {
-         input[i] = '\0';
-      }      
+      clearbuffer(input);
    }
 
    if (infile != stdin) {
