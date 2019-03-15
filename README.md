@@ -1,5 +1,12 @@
 # mush
 
+TO FUTURE STUDENTS: Please do not take this code and upload
+it as your own. The professors know you're doing this and it
+only hurts you. My program isn't even complete so it would
+be silly to copy this.
+
+--
+
 The Minimally Useful Shell. This shell can run all commands
 available to it in its given path. The shell also supports
 pipelines and features both an interactive and a batch
@@ -21,7 +28,3 @@ interrupt signal, it will close the shell.
 
 The shell can also be closed by running the built-in "exit"
 command.
-
-Written by Michael Georgariou for
-CPE 357 with Professor Nico at
-Cal Poly SLO.
