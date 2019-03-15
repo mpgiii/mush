@@ -153,9 +153,13 @@ int main(int argc, char* argv[]) {
 
       /* grab the input from stdin */
       while (((c = fgetc(infile)) != '\n') && (c != EOF)) {
-         if (length > LINE_LENGTH) {
-            fprintf(stderr, "command too long\n");
-            clearbuffer(input);
+         if (length == LINE_LENGTH) {
+            fprintf(stderr, "command too long.\n");
+            length++;
+            continue;
+         }
+         else if (length > LINE_LENGTH) {
+            continue;
          }
          else {
             input[length++] = c;
@@ -170,7 +174,8 @@ int main(int argc, char* argv[]) {
       }
       
       /* handle the input. see above function */
-      helper(input, length);
+      if (length <= LINE_LENGTH)
+         helper(input, length);
       
       /* clear the buffer for the next command */
       clearbuffer(input);
