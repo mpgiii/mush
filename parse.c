@@ -108,7 +108,7 @@ int main(int argc, char* argv[]) {
          return -1;
       }
       if (NULL == (infile = fopen(argv[1], "r"))) {
-         perror("fopen");
+         perror(argv[1]);
          return -1;
       }
    }
@@ -168,6 +168,10 @@ int main(int argc, char* argv[]) {
       for (i = 0; i < LINE_LENGTH; i++) {
          input[i] = '\0';
       }      
+   }
+
+   if (infile != stdin) {
+      fclose(infile);
    }
    
    return 0;
